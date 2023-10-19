@@ -2,81 +2,76 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <cctype>
 #include "structure/doubly_linked_list.h"
 
 using namespace std;
 
-// Função que verifica se um caractere é um sinal de pontuação
-bool isPunctuation(char c) {
-    return ispunct(static_cast<unsigned char>(c));
+// Função para remover pontuações do início e do final de uma palavra
+string removePunctuation(string word) {
+    while (!word.empty() && ispunct(word.front())) {
+        word = word.substr(1);
+    }
+    
+    while (!word.empty() && ispunct(word.back())) {
+        word.pop_back();
+    }
+    
+    return word;
 }
 
-// Função que lê e processa um arquivo de texto
-template <typename T>
-void openTxt(void (*printFunction)(T)) {
-    string directoryPath = filesystem::current_path().string() + "/data";
+void openTxt() {
+    string directoryPath = filesystem::current_path().string() + "/data";  // Obter o caminho atual e adicionar "/data"
 
     if (!filesystem::exists(directoryPath)) {
-        cout << "O diretório não foi encontrado." << endl;  // Exibe uma mensagem de erro se o diretório não existir
+        cout << "O diretório não foi encontrado" << endl;
         return;
     }
 
     DoublyLinkedList<string> files;
-    int fileCount = 0;
 
-    // Itera sobre os arquivos no diretório
-    for (const auto &entry : filesystem::directory_iterator(directoryPath)) {
-        if (entry.is_regular_file()) {
-            files.pushBack(entry.path().filename().stem().string());  // Adiciona o nome do arquivo à lista
-            fileCount++;
-        }
-    }
+    for (const auto &entry : filesystem::directory_iterator(directoryPath))
+        if (entry.is_regular_file())
+            files.pushBack(entry.path().filename().stem().string());
 
-    if (fileCount == 0) {
+    if (files.size() == 0) {
         cout << "Não há arquivos para realizar a leitura!" << endl;
         return;
     }
 
-    cout << "\nESCOLHA O ARQUIVO A SER INSERIDO NA ÁRVORE:" << endl;
+    int selection;  // Variável para armazenar a seleção do usuário
+    do {
+        cout << "\nEscolha um arquivo:" << endl;
 
-    // Apresenta os nomes dos arquivos disponíveis para leitura
-    for (int i = 0; i < files.size(); i++) {
-        cout << "[" << i + 1 << "]" << files.getValue(i) << " ";
-    }
+        for (int i = 0; i < files.size(); i++)
+            cout << "[" << i + 1 << "] " << files.getValue(i) << "  ";
 
-    cout << "\n> ";
+        cout << "\n> ";
+        cin >> selection;
+    } while (selection < 1 || selection > files.size());
+    
+    string fileName = directoryPath + "/" + files.getValue(selection - 1) + ".txt";  // Construir o nome do arquivo a ser aberto
 
-    int selection;
-    cin >> selection;
-    string fileName = directoryPath + '/' + files.getValue(selection - 1) + ".txt";  // Obtém o nome do arquivo selecionado
-
-    ifstream file(fileName);
+    ifstream file(fileName);  // Abrir o arquivo
 
     if (!file.is_open()) {
         cerr << "Não foi possível abrir o arquivo." << endl;
         return;
     }
 
-    string word;
-
-    while (file >> word) {
-        string cleanedWord = "";
-
-        for (size_t i = 0; i < word.length(); ++i) {
-            char c = word[i];
-
-            if (i == 0 || i == word.length() - 1) {
-                if (!isPunctuation(c)) {
-                    cleanedWord += c;
-                }
-            } else {
-                cleanedWord += c;
-            }
+    string line;  // Variável para armazenar cada linha do arquivo
+    int lineNumber = 1;  // Contador para o número da linha
+    
+    // Ler o arquivo linha por linha
+    while (getline(file, line)) {
+        istringstream iss(line);
+        string word;
+        while (iss >> word) {
+            word = removePunctuation(word);
+            if (word.size() >= 3)
+                cout << "Linha " << lineNumber << ": " << word << endl;
         }
-
-        if (cleanedWord.size() > 3) {
-            cout << cleanedWord << endl << endl;
-        }
+        lineNumber++;
     }
 
     file.close();
