@@ -68,7 +68,7 @@ void openTxt() {
         string word;
         while (iss >> word) {
             word = removePunctuation(word);
-            if (word.size() >= 3)
+            if (word.size() > 3)
                 cout << "Linha " << lineNumber << ": " << word << endl;
         }
         lineNumber++;
