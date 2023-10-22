@@ -19,7 +19,7 @@ class DoublyLinkedList {
         node<T> *start;
         node<T> *end;
         node<T> *getNode(int position);
-        int count;
+        int size;
     
     public:
         DoublyLinkedList();
@@ -30,26 +30,26 @@ class DoublyLinkedList {
         void deleteNode(int position);
         void pop();
         void switchNodes(int position1, int position2);
-        void printList(void (*printFunction)(T));
+        void display(void (*printFunction)(T));
         void printOneNode(void (*printFunction)(T), int postion);
-
         T getValue(int position);
+        T binarySearch(T searchValue, int startPosition, int finalPosition, int (*funcComp)(T, T), bool &found);
 
-        int size();
+        int getSize();
 };
 
 //CONSTRUTOR INICIANDO OS ATRIBUTOS.
 template <typename T>
 DoublyLinkedList<T>::DoublyLinkedList() {
-    start = nullptr;
-    end = nullptr;
-    count = 0;
+    start = NULL;
+    end = NULL;
+    size = 0;
 }
 
 //DESCONSTRUTOR.
 template <typename T>
 DoublyLinkedList<T>::~DoublyLinkedList() {
-    while (size() > 0) {
+    while (getSize() > 0) {
         pop();
     }
 }
@@ -57,13 +57,13 @@ DoublyLinkedList<T>::~DoublyLinkedList() {
 //MÉTODO RESPONSÁVEL POR RETORNAR UM PONTEIRO PARA O NÓ NA POSIÇÃO INFORMADA.
 template <typename T>
 node<T> *DoublyLinkedList<T>::getNode(int position) {
-    if (position < 0 || position > size() - 1)
-        return nullptr;
+    if (position < 0 || position > getSize() - 1)
+        return NULL;
     
     node<T> *aux;
-    if (position > size() / 2) {
+    if (position > getSize() / 2) {
         aux = end;
-        for (int i = size() - 1; i > position; i--)
+        for (int i = getSize() - 1; i > position; i--)
             aux = aux->previous;
     }
     else {
@@ -85,14 +85,14 @@ void DoublyLinkedList<T>::pushBack(T data) {
     if (end != nullptr)
         end->next = aux;
     end = aux;
-    count++;
+    size++;
 }
 
 //MÉTODO RESPONSÁVEL POR ADICIONAR DETERMINADO DADO NA LISTA. PODE-SE INSERIR EM QUALQUER POSIÇÃO DA LISTA, BASTA POSITION ESTAR ENTRE 0 E SIZE().
 template <typename T>
 void DoublyLinkedList<T>::append(T data, int position) {
-    if (position < 0 || position > size()) {
-        count--;
+    if (position < 0 || position > getSize()) {
+        getSize--;
         throw out_of_range("Position out of bounds");
     }
     node<T> *newNode = new node<T>();
@@ -107,7 +107,7 @@ void DoublyLinkedList<T>::append(T data, int position) {
         if (end == nullptr) {
             end = newNode;
         }
-    } else if (position == size()) {
+    } else if (position == getSize()) {
         newNode->next = nullptr;
         newNode->previous = end;
         if (end != nullptr) {
@@ -121,7 +121,7 @@ void DoublyLinkedList<T>::append(T data, int position) {
         aux->previous->next = newNode;
         aux->previous = newNode;
     }
-    count++;
+    getSize++;
 }
 
 //MÉTODO RESPONSÁVEL POR DELETAR O NÓ NA POSIÇÃO INFORMADA.
@@ -137,16 +137,16 @@ void DoublyLinkedList<T>::deleteNode(int position) {
         aux->previous->next = aux->next;
     if (position == 0)
         start = aux->next;
-    if (position == size() - 1)
+    if (position == getSize() - 1)
         end = aux->previous;
     delete aux;
-    count--;
+    size--;
 }
 
 //MÉTODO RESPONSÁVEL POR DELETAR O ÚLTIMO NÓ DA LISTA.
 template <typename T>
 void DoublyLinkedList<T>::pop() {
-    deleteNode(size() - 1);
+    deleteNode(getSize() - 1);
 }
 
 //MÉTODO RESPONSÁVEL POR TROCAR 2 NÓS DE POSIÇÃO NA LISTA.
@@ -175,10 +175,10 @@ T DoublyLinkedList<T>::getValue(int position)
 
 //MÉTODO RESPONSÁVEL POR IMPRIMIR A LISTA.
 template <typename T>
-void DoublyLinkedList<T>::printList(void (*printFunction)(T))
+void DoublyLinkedList<T>::display(void (*printFunction)(T))
 {
     node<T>* aux = start;
-    for (int i = 0; i < size(); i++)
+    for (int i = 0; i < getSize(); i++)
     {
         printFunction(aux->data);
         aux = aux->next;
@@ -196,8 +196,31 @@ void DoublyLinkedList<T>::printOneNode(void (*printFunction)(T), int position) {
 
 //MÉTODO RESPONSÁVEL POR RETORNAR O TAMANHO DA LISTA.
 template <typename T>
-int DoublyLinkedList<T>::size() {
-    return count;
+int DoublyLinkedList<T>::getSize() {
+    return size;
+}
+
+template <typename T>
+T DoublyLinkedList<T>::binarySearch(T searchValue, int startPosition, int finalPosition, int (*funcComp)(T, T), bool &found) {
+    if (finalPosition < startPosition) {
+        T notFound;
+        found = false;
+        return notFound;
+    }
+
+    int mid = (startPosition + finalPosition) / 2;
+    T midValue = getNode(mid)->data;
+    int compResult = funcComp(midValue, searchValue);
+
+    if (compResult == 0) {
+        return midValue;
+    }
+    if (compResult < 0) {
+        return binarySearch(searchValue, mid+1, finalPosition, funcComp, found);
+    }
+
+    return binarySearch(searchValue, startPosition, mid - 1, funcComp, found);
+
 }
 
 #endif

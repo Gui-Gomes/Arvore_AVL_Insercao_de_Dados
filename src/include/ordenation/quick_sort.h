@@ -35,7 +35,7 @@ void QuickSort<T>::sort(DoublyLinkedList<T> &list, int left, int right) {
 
 template <typename T>
 void QuickSort<T>::sort(DoublyLinkedList<T> &list) {
-    this->sort(list, 0, list.size() - 1);
+    this->sort(list, 0, list.getSize() - 1);
 }
 
 #endif
