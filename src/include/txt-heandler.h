@@ -4,6 +4,7 @@
 #include <string>
 #include <cctype>
 #include "structure/doubly_linked_list.h"
+#include "structure/avl_tree.h"
 
 using namespace std;
 
@@ -59,6 +60,8 @@ void openTxt() {
         return;
     }
 
+    AVLTree<string> tree;
+
     string line;  // Variável para armazenar cada linha do arquivo
     int lineNumber = 1;  // Contador para o número da linha
     
@@ -69,10 +72,12 @@ void openTxt() {
         while (iss >> word) {
             word = removePunctuation(word);
             if (word.size() > 3)
-                cout << "Linha " << lineNumber << ": " << word << endl;
+                tree.insert(word);
         }
         lineNumber++;
     }
 
     file.close();
+
+    tree.printTree();
 }
