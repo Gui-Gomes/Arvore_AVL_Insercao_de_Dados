@@ -24,7 +24,17 @@ string removePunctuation(string word)
     return word;
 }
 
-void openTxt()
+// Função para converter uma string em maiúsculas
+string toUpper(string word)
+{
+    for (char &c : word)
+    {
+        c = toupper(c);
+    }
+    return word;
+}
+
+void openTxt(AVLTree<string> &wordsTree)
 {
     string directoryPath = filesystem::current_path().string() + "/data"; // Obter o caminho atual e adicionar "/data"
 
@@ -68,12 +78,10 @@ void openTxt()
         return;
     }
 
-    AVLTree<string> tree;
-
-    string line;        // Variável para armazenar cada linha do arquivo
-    int lineNumber = 1; // Contador para o número da linha
+    string line; // Variável para armazenar cada linha do arquivo
 
     // Ler o arquivo linha por linha
+    int lineNumber = 1;
     while (getline(file, line))
     {
         istringstream iss(line);
@@ -82,12 +90,47 @@ void openTxt()
         {
             word = removePunctuation(word);
             if (word.size() > 3)
-                tree.insert(word);
+            {
+                // Converter a palavra em maiúsculas
+                string upperWord = toUpper(word);
+
+                // Procurar a palavra na árvore AVL de palavras
+                AVLNode<string> *node = wordsTree.find(upperWord);
+
+                if (node == nullptr)
+                {
+                    // Se a palavra não existe, crie um novo nó
+                    wordsTree.insert(upperWord);
+                    node = wordsTree.find(upperWord);
+                    node->files = new DoublyLinkedList<filesInfo>();
+                }
+                node->count++;
+
+                // Verificar se o arquivo já está na lista
+                bool fileExists = false;
+                for (int i = 0; i < node->files->size(); i++)
+                {
+                    if (node->files->getValue(i).fileName == files.getValue(selection - 1))
+                    {
+                        fileExists = true;
+                        node->files->getValue(i).lines->pushBack(lineNumber);
+                        break;
+                    }
+                }
+
+                if (!fileExists)
+                {
+                    filesInfo fileInfo;
+                    fileInfo.fileName = files.getValue(selection - 1);
+                    fileInfo.lines = new DoublyLinkedList<int>();
+                    fileInfo.lines->pushBack(lineNumber);
+                    node->files->pushBack(fileInfo);
+                }
+            }
         }
         lineNumber++;
     }
 
     file.close();
-
-    tree.printTree();
 }
+
