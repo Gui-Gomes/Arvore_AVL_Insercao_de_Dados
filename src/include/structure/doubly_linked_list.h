@@ -4,69 +4,77 @@
 
 using namespace std;
 
-//ESTRUTURA DO NÓ DA LISTA.
+// ESTRUTURA DO NÓ DA LISTA.
 template <typename T>
-struct node {
+struct node
+{
     T data;
     node<T> *next = nullptr;
     node<T> *previous = nullptr;
 };
 
-//ESTRUTURA DA LISTA DUPLAMENTE ENCADEADA.
+// ESTRUTURA DA LISTA DUPLAMENTE ENCADEADA.
 template <typename T>
-class DoublyLinkedList {
-    private:
-        node<T> *start;
-        node<T> *end;
-        node<T> *getNode(int position);
-        int count;
-    
-    public:
-        DoublyLinkedList();
-        ~DoublyLinkedList();
+class DoublyLinkedList
+{
+private:
+    node<T> *start;
+    node<T> *end;
+    node<T> *getNode(int position);
+    int count;
 
-        void pushBack(T data);
-        void append(T data, int position);
-        void deleteNode(int position);
-        void pop();
-        void switchNodes(int position1, int position2);
-        void printList(void (*printFunction)(T));
-        void printOneNode(void (*printFunction)(T), int postion);
+public:
+    DoublyLinkedList();
+    ~DoublyLinkedList();
 
-        T getValue(int position);
+    void pushBack(T data);
+    void append(T data, int position);
+    void deleteNode(int position);
+    void pop();
+    void switchNodes(int position1, int position2);
+    void printList(void (*printFunction)(T));
+    void printOneNode(void (*printFunction)(T), int postion);
 
-        int size();
+    T getValue(int position);
+
+    int size();
 };
 
-//CONSTRUTOR INICIANDO OS ATRIBUTOS.
+// CONSTRUTOR INICIANDO OS ATRIBUTOS.
 template <typename T>
-DoublyLinkedList<T>::DoublyLinkedList() {
+DoublyLinkedList<T>::DoublyLinkedList()
+{
     start = nullptr;
     end = nullptr;
     count = 0;
 }
 
-//DESCONSTRUTOR.
+// DESCONSTRUTOR.
 template <typename T>
-DoublyLinkedList<T>::~DoublyLinkedList() {
-    while (size() > 0) {
+DoublyLinkedList<T>::~DoublyLinkedList()
+{
+    while (size() > 0)
+    {
         pop();
     }
 }
 
-//MÉTODO RESPONSÁVEL POR RETORNAR UM PONTEIRO PARA O NÓ NA POSIÇÃO INFORMADA.
+// MÉTODO RESPONSÁVEL POR RETORNAR UM PONTEIRO PARA O NÓ NA POSIÇÃO INFORMADA.
 template <typename T>
-node<T> *DoublyLinkedList<T>::getNode(int position) {
+node<T> *DoublyLinkedList<T>::getNode(int position)
+{
     if (position < 0 || position > size() - 1)
         return nullptr;
-    
+
     node<T> *aux;
-    if (position > size() / 2) {
+    if (position > size() / 2)
+    {
         aux = end;
         for (int i = size() - 1; i > position; i--)
             aux = aux->previous;
     }
-    else {
+    else
+    {
         aux = start;
         for (int i = 0; i < position; i++)
             aux = aux->next;
@@ -74,9 +82,10 @@ node<T> *DoublyLinkedList<T>::getNode(int position) {
     return aux;
 }
 
-//MÉTODO RESPONSÁVEL POR ADICIONAR DETERMINADO DADO NO FINAL DA LISTA.
+// MÉTODO RESPONSÁVEL POR ADICIONAR DETERMINADO DADO NO FINAL DA LISTA.
 template <typename T>
-void DoublyLinkedList<T>::pushBack(T data) {
+void DoublyLinkedList<T>::pushBack(T data)
+{
     node<T> *aux = new node<T>();
     aux->data = data;
     aux->previous = end;
@@ -88,33 +97,43 @@ void DoublyLinkedList<T>::pushBack(T data) {
     count++;
 }
 
-//MÉTODO RESPONSÁVEL POR ADICIONAR DETERMINADO DADO NA LISTA. PODE-SE INSERIR EM QUALQUER POSIÇÃO DA LISTA, BASTA POSITION ESTAR ENTRE 0 E SIZE().
+// MÉTODO RESPONSÁVEL POR ADICIONAR DETERMINADO DADO NA LISTA. PODE-SE INSERIR EM QUALQUER POSIÇÃO DA LISTA, BASTA POSITION ESTAR ENTRE 0 E SIZE().
 template <typename T>
-void DoublyLinkedList<T>::append(T data, int position) {
-    if (position < 0 || position > size()) {
+void DoublyLinkedList<T>::append(T data, int position)
+{
+    if (position < 0 || position > size())
+    {
         count--;
         throw out_of_range("Position out of bounds");
     }
     node<T> *newNode = new node<T>();
     newNode->data = data;
-    if (position == 0) {
+    if (position == 0)
+    {
         newNode->next = start;
         newNode->previous = nullptr;
-        if (start != nullptr) {
+        if (start != nullptr)
+        {
             start->previous = newNode;
         }
         start = newNode;
-        if (end == nullptr) {
+        if (end == nullptr)
+        {
             end = newNode;
         }
-    } else if (position == size()) {
+    }
+    else if (position == size())
+    {
         newNode->next = nullptr;
         newNode->previous = end;
-        if (end != nullptr) {
+        if (end != nullptr)
+        {
             end->next = newNode;
         }
         end = newNode;
-    } else {
+    }
+    else
+    {
         node<T> *aux = getNode(position);
         newNode->next = aux;
         newNode->previous = aux->previous;
@@ -124,11 +143,13 @@ void DoublyLinkedList<T>::append(T data, int position) {
     count++;
 }
 
-//MÉTODO RESPONSÁVEL POR DELETAR O NÓ NA POSIÇÃO INFORMADA.
+// MÉTODO RESPONSÁVEL POR DELETAR O NÓ NA POSIÇÃO INFORMADA.
 template <typename T>
-void DoublyLinkedList<T>::deleteNode(int position) {
-    node<T>* aux = getNode(position);
-    if (!aux) {
+void DoublyLinkedList<T>::deleteNode(int position)
+{
+    node<T> *aux = getNode(position);
+    if (!aux)
+    {
         throw out_of_range("Position out of bounds");
     }
     if (aux->next != nullptr)
@@ -143,18 +164,21 @@ void DoublyLinkedList<T>::deleteNode(int position) {
     count--;
 }
 
-//MÉTODO RESPONSÁVEL POR DELETAR O ÚLTIMO NÓ DA LISTA.
+// MÉTODO RESPONSÁVEL POR DELETAR O ÚLTIMO NÓ DA LISTA.
 template <typename T>
-void DoublyLinkedList<T>::pop() {
+void DoublyLinkedList<T>::pop()
+{
     deleteNode(size() - 1);
 }
 
-//MÉTODO RESPONSÁVEL POR TROCAR 2 NÓS DE POSIÇÃO NA LISTA.
+// MÉTODO RESPONSÁVEL POR TROCAR 2 NÓS DE POSIÇÃO NA LISTA.
 template <typename T>
-void DoublyLinkedList<T>::switchNodes(int position1, int position2) {
-    node<T>* node1 = getNode(position1);
-    node<T>* node2 = getNode(position2);
-    if (!node1 || !node2) {
+void DoublyLinkedList<T>::switchNodes(int position1, int position2)
+{
+    node<T> *node1 = getNode(position1);
+    node<T> *node2 = getNode(position2);
+    if (!node1 || !node2)
+    {
         throw out_of_range("Position out of bounds");
     }
     T aux = node1->data;
@@ -162,22 +186,23 @@ void DoublyLinkedList<T>::switchNodes(int position1, int position2) {
     node2->data = aux;
 }
 
-//MÉTODO RESPONSÁVEL POR RETORNAR O DADO CONTIDO NO NÓ INFORMADO.
+// MÉTODO RESPONSÁVEL POR RETORNAR O DADO CONTIDO NO NÓ INFORMADO.
 template <typename T>
 T DoublyLinkedList<T>::getValue(int position)
 {
     node<T> *aux = getNode(position);
-    if (aux) {
+    if (aux)
+    {
         return aux->data;
     }
     throw out_of_range("Position out of bounds");
 }
 
-//MÉTODO RESPONSÁVEL POR IMPRIMIR A LISTA.
+// MÉTODO RESPONSÁVEL POR IMPRIMIR A LISTA.
 template <typename T>
 void DoublyLinkedList<T>::printList(void (*printFunction)(T))
 {
-    node<T>* aux = start;
+    node<T> *aux = start;
     for (int i = 0; i < size(); i++)
     {
         printFunction(aux->data);
@@ -185,18 +210,21 @@ void DoublyLinkedList<T>::printList(void (*printFunction)(T))
     }
 }
 
-//MÉTODO RESPONSÁVEL POR IMPRIMIR O DADO PRESENTE NO NÓ DA POSIÇÃO INFORMADA.
+// MÉTODO RESPONSÁVEL POR IMPRIMIR O DADO PRESENTE NO NÓ DA POSIÇÃO INFORMADA.
 template <typename T>
-void DoublyLinkedList<T>::printOneNode(void (*printFunction)(T), int position) {
-    node<T>* aux = getNode(position);
-    if (aux) {
+void DoublyLinkedList<T>::printOneNode(void (*printFunction)(T), int position)
+{
+    node<T> *aux = getNode(position);
+    if (aux)
+    {
         printFunction(aux->data);
     }
 }
 
-//MÉTODO RESPONSÁVEL POR RETORNAR O TAMANHO DA LISTA.
+// MÉTODO RESPONSÁVEL POR RETORNAR O TAMANHO DA LISTA.
 template <typename T>
-int DoublyLinkedList<T>::size() {
+int DoublyLinkedList<T>::size()
+{
     return count;
 }
 
