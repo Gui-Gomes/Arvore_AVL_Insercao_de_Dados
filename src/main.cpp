@@ -1,7 +1,17 @@
 #include <iostream>
-#include "include/txt-heandler.h"
+#include "include/structure/avl_tree.h"
+#include "ordenation/quick_sort.h"
 
-int main() {
-    openTxt();
-    return 0;
+// IMPLEMENTAÇÃO DA INTERFACE QUICKSORT PARA ORGANIZAR STRINGS
+class StringQuickSort : public QuickSort<string>
+{
+    virtual int sort(string word1, string word2)
+    {
+        return word1.compare(word2);
+    }
+};
+
+int main()
+{
+    AVLTree<string> words;
 }
